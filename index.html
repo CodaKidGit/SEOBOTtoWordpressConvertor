@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS HTML to WordPress Theme Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #8c2ca3, #ce5eea);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .input-section, .output-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-section h2, .output-section h2 {
+            color: #2f2961;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            background: #fafafa;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #8c2ca3;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: #8c2ca3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #ce5eea;
+            transform: translateY(-2px);
+        }
+        
+        .btn.secondary {
+            background: #2f2961;
+        }
+        
+        .btn.secondary:hover {
+            background: #554ba4;
+        }
+        
+        .conversion-rules {
+            background: #f8f9fa;
+            border-left: 4px solid #8c2ca3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .conversion-rules h3 {
+            color: #2f2961;
+            margin-bottom: 15px;
+        }
+        
+        .rule-item {
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .rule-item:last-child {
+            border-bottom: none;
+        }
+        
+        .rule-from {
+            color: #d88000;
+            font-weight: 600;
+        }
+        
+        .rule-to {
+            color: #5a8a1b;
+            font-weight: 600;
+        }
+        
+        .preview-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .preview-section h3 {
+            color: #2f2961;
+            margin-bottom: 15px;
+        }
+        
+        .preview-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .status {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* WordPress Theme Styles for Preview - Matching CodaKid Blog */
+        .wp-content h1, .wp-content h2, .wp-content h3, .wp-content h4, .wp-content h5, .wp-content h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            line-height: 120%;
+            color: #1d133e;
+            text-align: left !important;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .wp-content h1 {
+            font-size: clamp(1.875rem, 2.8965517241vw + 1.2956896552rem, 4.5rem);
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .wp-content h2 {
+            font-size: clamp(1.5rem, 1.9310344828vw + 1.1137931034rem, 3.25rem);
+            margin-top: 3rem;
+            margin-bottom: 1.75rem;
+        }
+        
+        .wp-content h3 {
+            font-size: clamp(1.25rem, 1.1034482759vw + 1.0293103448rem, 2.25rem);
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .wp-content h4 {
+            font-size: clamp(1.125rem, 0.4137931034vw + 1.0422413793rem, 1.5rem);
+            margin-top: 2rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .wp-content h5 {
+            font-size: clamp(1rem, 0.5517241379vw + 0.8896551724rem, 1.5rem);
+            margin-top: 1.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .wp-content h6 {
+            font-size: clamp(0.875rem, 0.4137931034vw + 0.7922413793rem, 1.25rem);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .wp-content h1 a, .wp-content h2 a, .wp-content h3 a,
+        .wp-content h4 a, .wp-content h5 a, .wp-content h6 a {
+            font-size: inherit !important;
+            font-weight: inherit !important;
+            color: #2f2961;
+            text-decoration: underline;
+        }
+        
+        .wp-content h1 a:hover, .wp-content h2 a:hover, .wp-content h3 a:hover,
+        .wp-content h4 a:hover, .wp-content h5 a:hover, .wp-content h6 a:hover {
+            color: #ce5eea;
+        }
+        
+        .wp-content p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(0.875rem, 0.1379310345vw + 0.8474137931rem, 1rem);
+            line-height: 150%;
+            color: #1d133e;
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+        
+        .wp-content a {
+            color: #2f2961;
+            text-decoration: underline;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .wp-content a:hover {
+            color: #ce5eea;
+        }
+        
+        .wp-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .wp-content ul, .wp-content ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+        
+        .wp-content li {
+            margin-bottom: 0.5rem;
+            line-height: 150%;
+        }
+        
+        .wp-content blockquote {
+            border-left: 4px solid #8c2ca3;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            background: rgba(140, 44, 163, 0.05);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SaaS HTML to WordPress Converter</h1>
+            <p>Transform your SaaS-generated HTML to match your CodaKid WordPress theme styling</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <h2>📝 Input HTML from SaaS Service</h2>
+                <textarea id="inputHtml" placeholder="Paste your HTML content from the SaaS service here..."></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn" onclick="convertHtml()">🔄 Convert to WordPress Format</button>
+                <button class="btn secondary" onclick="clearAll()">🗑️ Clear All</button>
+                <button class="btn secondary" onclick="loadSample()">📄 Load Sample HTML</button>
+            </div>
+            
+            <div class="conversion-rules">
+                <h3>🎯 Conversion Rules Applied:</h3>
+                <div class="rule-item">
+                    <span class="rule-from">Removed inline styles</span> → <span class="rule-to">Let WordPress CSS handle all styling naturally</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-from">Font sizing & spacing</span> → <span class="rule-to">Use exact CSS from your blog.min.css file</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-from">WordPress classes only</span> → <span class="rule-to">heading_title, has-text-color for proper integration</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-from">Links in headings</span> → <span class="rule-to">Inherit parent heading size automatically</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-from">SaaS tabindex & class attributes</span> → <span class="rule-to">Removed (WordPress doesn't need them)</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-from">Generic headings</span> → <span class="rule-to">WordPress theme heading classes with responsive sizing</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-from">Plain tables</span> → <span class="rule-to">Styled tables with theme colors</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-from">SaaS iframes</span> → <span class="rule-to">Responsive video embeds</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-from">Script tags & JSON-LD</span> → <span class="rule-to">Removed (not needed in WordPress posts)</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-from">Images & links</span> → <span class="rule-to">Theme-styled with proper spacing</span>
+                </div>
+            </div>
+            
+            <div class="output-section">
+                <h2>✨ WordPress-Compatible HTML Output</h2>
+                <textarea id="outputHtml" placeholder="Converted HTML will appear here..." readonly></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+                <button class="btn secondary" onclick="downloadHtml()">💾 Download HTML</button>
+                <button class="btn secondary" onclick="togglePreview()">👀 Toggle Preview</button>
+            </div>
+            
+            <div id="status"></div>
+            
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <h3>🔍 Live Preview</h3>
+                <div class="preview-content wp-content" id="previewContent">
+                    Preview will appear here when you convert HTML...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function convertHtml() {
+            const input = document.getElementById('inputHtml').value.trim();
+            if (!input) {
+                showStatus('Please enter some HTML content to convert.', 'error');
+                return;
+            }
+            
+            let converted = input;
+            
+            // Remove SaaS-specific attributes and clean up
+            converted = converted.replace(/\s+tabindex="-1"/gi, '');
+            converted = converted.replace(/\s+class="sb[^"]*"/gi, '');
+            converted = converted.replace(/\s+data-faq-q/gi, '');
+            converted = converted.replace(/<h6[^>]*>sbb-itb-\d+<\/h6>/gi, '');
+            
+            // Convert headings with WordPress theme classes, preserving existing attributes
+            converted = converted.replace(/<h1([^>]*?)(?:\s+class="[^"]*")?([^>]*)>/gi, '<h1$1$2 class="heading_title title_h1" style="text-align: left; margin-top: 1rem; margin-bottom: 2rem;">');
+            converted = converted.replace(/<h2([^>]*?)(?:\s+class="[^"]*")?([^>]*)>/gi, '<h2$1$2 class="heading_title title_h2" style="text-align: left; margin-top: 3rem; margin-bottom: 1.75rem;">');
+            converted = converted.replace(/<h3([^>]*?)(?:\s+class="[^"]*")?([^>]*)>/gi, '<h3$1$2 class="heading_title title_h3" style="text-align: left; margin-top: 2.5rem; margin-bottom: 1.5rem;">');
+            converted = converted.replace(/<h4([^>]*?)(?:\s+class="[^"]*")?([^>]*)>/gi, '<h4$1$2 class="heading_title title_h4" style="text-align: left; margin-top: 2rem; margin-bottom: 1.25rem;">');
+            converted = converted.replace(/<h5([^>]*?)(?:\s+class="[^"]*")?([^>]*)>/gi, '<h5$1$2 class="heading_title title_h5" style="text-align: left; margin-top: 1.75rem; margin-bottom: 1rem;">');
+            converted = converted.replace(/<h6([^>]*?)(?:\s+class="[^"]*")?([^>]*)>/gi, '<h6$1$2 class="heading_title title_h6" style="text-align: left; margin-top: 1.5rem; margin-bottom: 1rem;">');
+            
+            // Convert paragraphs to WordPress style with better spacing
+            converted = converted.replace(/<p([^>]*)>/gi, '<p$1 class="has-text-color" style="margin-bottom: 1.25rem; text-align: left;">');
+            
+            // Handle tables with WordPress styling
+            converted = converted.replace(/<table([^>]*)>/gi, '<table$1 style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-family: Montserrat, sans-serif;">');
+            converted = converted.replace(/<th([^>]*)>/gi, '<th$1 style="background-color: #8c2ca3; color: white; padding: 0.75rem; text-align: left; font-weight: 700; border: 1px solid #ddd;">');
+            converted = converted.replace(/<td([^>]*)>/gi, '<td$1 style="padding: 0.75rem; border: 1px solid #ddd; line-height: 150%;">');
+            
+            // Convert images to be responsive
+            converted = converted.replace(/<img([^>]*?)(?:\s+style="[^"]*")?([^>]*?)>/gi, '<img$1$2 style="max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0;">');
+            
+            // Handle iframes (YouTube videos)
+            converted = converted.replace(/<iframe([^>]*?)(?:\s+class="[^"]*")?([^>]*?)>/gi, '<iframe$1$2 style="width: 100%; height: auto; aspect-ratio: 16/9; border-radius: 8px; margin: 1.5rem 0;">');
+            
+            // Convert links with WordPress theme colors
+            converted = converted.replace(/<a([^>]*?)>/gi, function(match, attrs) {
+                // Preserve existing attributes but ensure WordPress styling
+                return `<a${attrs} style="color: #2f2961; text-decoration: underline; font-weight: 500; transition: all 0.3s ease;">`;
+            });
+            
+            // Fix links inside headings to inherit font size
+            converted = converted.replace(/(<h[1-6][^>]*>.*?)<a([^>]*?)style="([^"]*?)"([^>]*?)>(.*?)<\/a>(.*?<\/h[1-6]>)/gi, function(match, beforeLink, aAttrs, currentStyle, afterAttrs, linkText, afterLink) {
+                // Remove font-size from existing styles and add inherit
+                let newStyle = currentStyle.replace(/font-size:\s*[^;]+;?/gi, '');
+                newStyle += '; font-size: inherit; font-weight: inherit;';
+                return `${beforeLink}<a${aAttrs}style="${newStyle}"${afterAttrs}>${linkText}</a>${afterLink}`;
+            });
+            
+            // Convert lists with proper spacing
+            converted = converted.replace(/<ul([^>]*)>/gi, '<ul$1 style="margin: 1rem 0; padding-left: 2rem; list-style-type: disc;">');
+            converted = converted.replace(/<ol([^>]*)>/gi, '<ol$1 style="margin: 1rem 0; padding-left: 2rem;">');
+            converted = converted.replace(/<li([^>]*)>/gi, '<li$1 style="margin-bottom: 0.75rem; line-height: 150%; color: #1d133e;">');
+            
+            // Convert blockquotes with theme styling
+            converted = converted.replace(/<blockquote([^>]*)>/gi, '<blockquote$1 style="border-left: 4px solid #8c2ca3; padding: 1.5rem; margin: 2rem 0; background: rgba(140, 44, 163, 0.05); font-style: italic; border-radius: 0 8px 8px 0; color: #2f2961;">');
+            
+            // Remove script tags and JSON-LD (not needed in WordPress post content)
+            converted = converted.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+            
+            // Wrap content in WordPress theme container structure
+            converted = `<div id="single-content" style="margin-bottom: 1.875rem; font-family: Montserrat, sans-serif;">
+    <div class="entry-content">
+        <div class="wide-container">
+            <div class="wp-block-column">
+                ${converted}
+            </div>
+        </div>
+    </div>
+</div>`;
+            
+            document.getElementById('outputHtml').value = converted;
+            updatePreview(converted);
+            showStatus('HTML successfully converted to WordPress format! SaaS-specific elements removed and theme styling applied.', 'success');
+        }
+        
+        function updatePreview(html) {
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = html;
+        }
+        
+        function togglePreview() {
+            const previewSection = document.getElementById('previewSection');
+            if (previewSection.style.display === 'none') {
+                previewSection.style.display = 'block';
+                const outputHtml = document.getElementById('outputHtml').value;
+                if (outputHtml) {
+                    updatePreview(outputHtml);
+                }
+            } else {
+                previewSection.style.display = 'none';
+            }
+        }
+        
+        function copyToClipboard() {
+            const output = document.getElementById('outputHtml');
+            if (!output.value.trim()) {
+                showStatus('No converted HTML to copy. Please convert some HTML first.', 'error');
+                return;
+            }
+            
+            output.select();
+            document.execCommand('copy');
+            showStatus('HTML copied to clipboard!', 'success');
+        }
+        
+        function downloadHtml() {
+            const output = document.getElementById('outputHtml').value;
+            if (!output.trim()) {
+                showStatus('No converted HTML to download. Please convert some HTML first.', 'error');
+                return;
+            }
+            
+            const blob = new Blob([output], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'wordpress-converted.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showStatus('HTML file downloaded!', 'success');
+        }
+        
+        function clearAll() {
+            document.getElementById('inputHtml').value = '';
+            document.getElementById('outputHtml').value = '';
+            document.getElementById('previewContent').innerHTML = 'Preview will appear here when you convert HTML...';
+            document.getElementById('previewSection').style.display = 'none';
+            showStatus('All content cleared.', 'success');
+        }
+        
+        function loadSample() {
+            const sampleHtml = `<h1 id="roblox-vs-minecraft-which-is-better-for-learning-code" tabindex="-1">Roblox vs Minecraft: Which is Better for Learning Code?</h1>
+<p><strong><a href="https://www.roblox.com/" target="_blank" rel="nofollow noopener noreferrer">Roblox</a> and <a href="https://www.minecraft.net/en-us" target="_blank" rel="nofollow noopener noreferrer">Minecraft</a> are two popular platforms for teaching kids coding, each offering unique benefits depending on age, learning style, and goals.</strong></p>
+<ul>
+<li><strong>Roblox</strong> focuses on <a href="https://codakid.com/lessons/building-the-game/">game creation</a> with <a href="https://en.wikipedia.org/wiki/Lua_(programming_language)" target="_blank" rel="nofollow noopener noreferrer">Lua</a> scripting, ideal for kids 10+ who want <a href="https://codakid.com/programming-courses-for-high-school-students/">hands-on coding experience</a>. It's more advanced but offers opportunities to create and even monetize games.</li>
+<li><strong>Minecraft</strong> starts with <a href="https://codakid.com/category/block-coding/">visual block-based coding</a> (<a href="https://www.microsoft.com/en-us/makecode" target="_blank" rel="nofollow noopener noreferrer">MakeCode</a>) and progresses to Python or Java, making it suitable for younger learners (6+) or beginners. It emphasizes logic and problem-solving through gameplay.</li>
+</ul>
+<p>Both platforms encourage coding through interactive projects, but Roblox has a steeper learning curve, while Minecraft provides a smoother introduction.</p>
+<h3 id="quick-comparison" tabindex="-1">Quick Comparison</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Roblox</th>
+<th>Minecraft</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Primary Language</strong></td>
+<td>Lua (text-based)</td>
+<td>MakeCode (visual), Python, Java</td>
+</tr>
+<tr>
+<td><strong>Learning Curve</strong></td>
+<td>Steeper</td>
+<td>Gradual</td>
+</tr>
+<tr>
+<td><strong>Best Age Range</strong></td>
+<td>10+ years</td>
+<td>6+ years</td>
+</tr>
+</tbody>
+</table>`;
+            
+            document.getElementById('inputHtml').value = sampleHtml;
+            showStatus('Your actual SaaS HTML sample loaded. Click "Convert" to see the transformation!', 'success');
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Auto-resize textareas
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
