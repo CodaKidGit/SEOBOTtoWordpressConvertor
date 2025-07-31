@@ -385,7 +385,7 @@
             converted = converted.replace(/<h6([^>]*?)(?:\s+class="[^"]*")?([^>]*)>/gi, '<h6$1$2 class="heading_title title_h6" style="text-align: left; margin-top: 1.5rem; margin-bottom: 1rem;">');
             
             // Convert paragraphs to WordPress style with better spacing
-            converted = converted.replace(/<p([^>]*)>/gi, '<p$1 class="has-text-color" style="margin-bottom: 1.25rem; text-align: left;">');
+            converted = converted.replace(/<p([^>]*)>/gi, '<p$1 style="margin-bottom: 1.25rem; text-align: left;">');
             
             // Handle tables with WordPress styling
             converted = converted.replace(/<table([^>]*)>/gi, '<table$1 style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-family: Montserrat, sans-serif;">');
